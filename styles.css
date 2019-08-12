@@ -67,7 +67,6 @@ body {
     font-size: 1.4em;
     cursor: pointer;
   }
-/* hiding until we figure this part out
   #nav ul {
     background: #027FAA;
     width: 100%;
@@ -81,5 +80,4 @@ body {
     line-height: 20px;
     border-top: 1px solid #333;
   }
-*/
 }
