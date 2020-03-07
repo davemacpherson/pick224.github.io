@@ -7,6 +7,7 @@ body {
 }
 .navbar {
   background-color: #027faa;
+  z-index: 1200;
 }
 .navbar .navbar-brand {
   color: #e8e7dc;
