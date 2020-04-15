@@ -1,0 +1,179 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=.55, maximum-scale=.55, minimum-scale=.55, shrink-to-fit=no">
+  <meta name="description" content="Scraping Canadian Hockey League (CHL) game data from HTML pages using Python">
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-143825138-1"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+
+        function gtag() {
+            dataLayer.push(arguments);
+        }
+        gtag('js', new Date());
+
+        gtag('config', 'UA-143825138-1');
+    </script>
+
+    <title>Pick224 - Hockey Prospect Stats - Scraping CHL data</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link rel="shortcut icon" type="image/png" href="https://pick224.com//resources/favicon.gif" />
+    <link href="https://pick224.com/resources/css/starter-template.css" rel="stylesheet">
+</head>
+
+<body>
+  <nav class="navbar navbar-expand-md navbar-dark fixed-top" style = "z-index = 1200">
+    <div class="logo" href="#"><img src="https://pick224.com/resources/pick224.gif" alt="Pick224" height="51" width="202"></div>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExampleDefault" aria-controls="navbarsExampleDefault" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarsExampleDefault" style = "z-index = 1200">
+      <ul class="navbar-nav mr-auto">
+        <li class="nav-item">
+          <a class="nav-link" href="https://pick224.com">Home</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="https://pick224.com/2020">2020</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="https://pick224.com/dataviz">Viz</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="https://pick224.com/totals">Totals</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="https://pick224.com/pairings">Pairings</a>
+        </li>
+        <li class="nav-item active">
+          <a class="nav-link" href="https://pick224.com/blog">Blog<span class="sr-only">(current)</span></a>
+        </li>
+      </ul>
+    </div>
+  </nav>
+
+<div class="container">
+  <h2 id="scraping-nuorten-sm-liiga-shot-attempts">Scraping Canadian Hockey League (CHL) game data using Python</h2>
+  <p><em>By Dave MacPherson | Posted Mar 4, 2020</p></em>
+  <hr>
+
+  <p>In July 2019, I launched <a href="https://pick224.com/">Pick224</a>, a website containing data from over 15 hockey leagues across the world with a focus on junior hockey. To compile this data, I first scrape all the individual game summaries of each league, then clean the data, total up all the stats, and join the results with each player’s biographical information.</p>
+
+  <p>This week, I rebuilt my Canadian Hockey League (CHL) scrapers from scratch. In what follows, I’ll describe how I found the data I needed and how I coded the scrapers in Python.</p>
+
+  <p>I will not be sharing the previous versions of my code in this article, for they are wretched and incoherent. But, the code worked. If you’re new to coding web scrapers or are just starting a project, I’d like to stress the importance of writing code that gets you the data you need, even if your code is inefficient and your data requires a lot of cleaning. Then, as you slowly begin to better understand your data and your needs, make small improvements. Eventually, you’ll have a great grasp of your data and some decent code.</p>
+
+  <hr />
+
+  <p><strong>Understanding the data</strong></p>
+
+  <p>Before I start writing a scraper, I always want to know what data is available and what I need. For the CHL, I needed the following:<br />
+  • A listing of every goal scored in each game; and<br />
+  • A listing of every team’s lineup for each game</p>
+
+  <p>In this article, I’ll only dive into extracting the lineups.</p>
+
+  <p>I found the data I needed on one page for each game on the league’s official website. As an example, <a href="https://ontariohockeyleague.com/gamecentre/24633/boxscore">here’s</a> a game summary for a recent OHL game.</p>
+
+  <p>The game’s lineups are listed in the “Game Summary” tab:</p>
+
+  <p><img src="images/chl-game-summary-tab.png" class = "img-responsive" width = "80%" alt="alt text" title="CHL Game Summary tab" /></p>
+
+  <p>I could have scraped all the text from this page’s source to get what I needed, but there’s a much more organized way to get the data.</p>
+
+  <p>To find how and where the data is stored, I opened the game summary in Firefox, right-clicked, and clicked “Inspect Element” to bring up Firefox’s handy Inspector tool.</p>
+
+  <p>Navigating to the <em>Network</em> tab, refreshing the page, and filtering for “XHR” brought up all the data that goes into the webpage:</p>
+
+  <p><img src="images/chl-firefox-network.png" class = "img-responsive" width = "80%" alt="alt text" title="Firefox Network tab" /></p>
+
+  <p>By clicking each of these files and looking at the <em>Response</em> tab, I could see what data was sent in order to create the lineups. The file ending in <em>tab=gamesummary</em> is the file containing the data for each team’s lineup in a clean JSON tree:</p>
+
+  <p><img src="images/chl-firefox-response.png" class = "img-responsive" width = "50%" alt="alt text" title="Firefox Response" /></p>
+
+  <p>The <em>Params</em> tab includes the parameters the site uses to populate the <em>Response</em> with the specific game’s data. In this case, the most important parameter is the “game_id”, which is unique for each game:</p>
+
+  <p><img src="images/chl-firefox-params.png" class = "img-responsive" width = "50%" alt="alt text" title="Firefox parameters" /></p>
+
+  <p>Going back to the <em>Network</em> tab, I accessed the full <em>gamesummary</em> file by right-clicking and selecting “Open in New Tab”. The result is one big dictionary containing all of the game’s data:</p>
+
+  <p><img src="images/chl-firefox-json.png" class = "img-responsive" width = "100%" alt="alt text" title="Firefox JSON" /></p>
+
+  <p>All of the parameters above become part of the URL: <a href="https://cluster.leaguestat.com/feed/index.php?feed=gc&amp;key=2976319eb44abe94&amp;client_code=ohl&amp;game_id=24633&amp;lang_code=en&amp;fmt=json&amp;tab=gamesummary">https://cluster.leaguestat.com/feed/index.php?feed=gc&amp;key=2976319eb44abe94&amp;client_code=ohl&amp;game_id=24633&amp;lang_code=en&amp;fmt=json&amp;tab=gamesummary</a></p>
+
+  <p>My scraper needed to pull the lineups from these pages, and I then had to organize the data in a readable format.</p>
+
+  <hr />
+
+  <p><strong>Writing the Python code</strong></p>
+
+  <p>Now that I knew where to find the data I needed, it was time to write the Python code to get that data.</p>
+
+  <p>First, I imported the different Python libraries I would be using and specified a file to write the results to:</p>
+
+  <p><img src="images/chl-py-imports.png" class = "img-responsive" width = "50%" alt="alt text" title="Python imports" /></p>
+
+  <p>Next, I specified the game_id for the game I was scraping, along with the URL I was pulling the data from. I used Python’s <em>requests</em> library to send a request to the specified URL so I could grab the data:</p>
+
+  <p><img src="images/chl-py-url.png" class = "img-responsive" width = "100%" alt="alt text" title="Python URLs" /></p>
+
+  <p>The next step is to pull the JSON from the webpage:</p>
+
+  <p><img src="images/chl-py-fjson.png" class = "img-responsive" width = "50%" alt="alt text" title="Python JSON" /></p>
+
+  <p>This code pulls the entire JSON code we saw in Firefox above:</p>
+
+  <p><img src="images/chl-firefox-response2.png" class = "img-responsive" width = "50%" alt="alt text" title="Firefox JSON" /></p>
+
+  <p>The JSON contains a <em>lot</em> of data about the game:</p>
+
+  <p><img src="images/chl-json-ex.png" class = "img-responsive" width = "100%" alt="alt text" title="JSON example" /></p>
+
+  <p>The home team’s lineup is found in the path <em>GC -&gt; Gamesummary -&gt; home_team_lineup -&gt; players</em> and the away team’s in <em>GC -&gt; Gamesummary -&gt; visitor_team_lineup -&gt; players</em>. This code extracts only those lineups:</p>
+
+  <p><img src="images/chl-hdata-adata.png" class = "img-responsive" width = "80%" alt="alt text" title="Python lineups" /></p>
+
+  <p>And this code converts the lineups to a much more readable format, a DataFrame, using Python’s <em>pandas</em> library:</p>
+
+  <p><img src="images/chl-dfh-dfa.png" class = "img-responsive" width = "80%" alt="alt text" title="Python lineup DataFrame" /></p>
+
+  <p>When printed, the home team lineup DataFrame is a table containing columns for all the different available data and rows for each player:</p>
+
+  <p><img src="images/chl-py-dataframe-output.png" class = "img-responsive" width = "80%" alt="alt text" title="Python DataFrame output" /></p>
+
+  <p>The DataFrame does not include the game_id, which would be very useful when I was ready to pull more than one game. This code adds a column containing the game_id and a column specifying whether each player was on the home or away team:</p>
+
+  <p><img src="images/chl-py-add-game-no.png" class = "img-responsive" width = "80%" alt="alt text" title="Python add game number" /></p>
+
+  <p>I then used this code to specify which columns I wanted to keep and in what order:</p>
+
+  <p><img src="images/chl-py-column-order.png" class = "img-responsive" width = "100%" alt="alt text" title="Python DataFrame column order" /></p>
+
+  <p>Here’s the resulting DataFrame for the home team’s lineup:</p>
+
+  <p><img src="images/chl-dataframe-output-home.png" class = "img-responsive" width = "100%" alt="alt text" title="Home team lineup" /></p>
+
+  <p>This looks good! Lastly, I wrote each lineup to the CSV file I specified in the first lines of the code, including the column headers only in the first line so they don’t show up twice:</p>
+
+  <p><img src="images/chl-output.png" class = "img-responsive" width = "80%" alt="alt text" title="Python output" /></p>
+
+  <p>The result is a tidy pipe-delimited CSV file containing all the information I wanted from the game’s lineups:</p>
+
+  <p><img src="images/chl-output-final.png" class = "img-responsive" width = "100%" alt="alt text" title="CHL roster final output" /></p>
+
+  <p>Here’s all the code at once:</p>
+
+  <script src="https://gist.github.com/davemacpherson/79682783e8f2cea94ba1b853db667911.js"></script>
+
+  <p>After I had working code for pulling one game’s data, I found the game_ids for each game and optimized my code to pull every game in one go. I then pulled all of the goal data from the same JSON code, equipping me with everything I needed to compile the stats found on <a href="http://pick224.com/2020">Pick224</a>.</p>
+
+  <hr />
+
+  <p><em>If web scraping isn’t for you and you’d rather jump right into data analysis, feel free to download any of the data available on</em> <a href="https://pick224.com/index.html"><em>Pick224</em></a><em>. If you do something cool with the data, please let me know on</em> <a href="http://twitter.com/davemacp"><em>Twitter</em></a><em>!</em></p>
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+</div>
+</body></html>

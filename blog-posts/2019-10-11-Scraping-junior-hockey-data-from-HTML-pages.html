@@ -1,0 +1,193 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=.55, maximum-scale=.55, minimum-scale=.55, shrink-to-fit=no">
+  <meta name="description" content="Scraping junior hockey data from HTML pages using Python">
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-143825138-1"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+
+        function gtag() {
+            dataLayer.push(arguments);
+        }
+        gtag('js', new Date());
+
+        gtag('config', 'UA-143825138-1');
+    </script>
+
+    <title>Pick224 - Hockey Prospect Stats - Scraping junior hockey data</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link rel="shortcut icon" type="image/png" href="https://pick224.com//resources/favicon.gif" />
+    <link href="https://pick224.com/resources/css/starter-template.css" rel="stylesheet">
+</head>
+
+<body>
+  <nav class="navbar navbar-expand-md navbar-dark fixed-top" style = "z-index = 1200">
+    <div class="logo" href="#"><img src="https://pick224.com/resources/pick224.gif" alt="Pick224" height="51" width="202"></div>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExampleDefault" aria-controls="navbarsExampleDefault" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarsExampleDefault" style = "z-index = 1200">
+      <ul class="navbar-nav mr-auto">
+        <li class="nav-item">
+          <a class="nav-link" href="https://pick224.com">Home</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="https://pick224.com/2020">2020</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="https://pick224.com/dataviz">Viz</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="https://pick224.com/totals">Totals</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="https://pick224.com/pairings">Pairings</a>
+        </li>
+        <li class="nav-item active">
+          <a class="nav-link" href="https://pick224.com/blog">Blog<span class="sr-only">(current)</span></a>
+        </li>
+      </ul>
+    </div>
+  </nav>
+
+<div class="container">
+  <h2 id="scraping-nuorten-sm-liiga-shot-attempts">Scraping junior hockey data from HTML pages using Python</h2>
+  <p><em>By Dave MacPherson | Posted Oct 11, 2019</p></em>
+  <hr>
+
+<p>This past July, I launched <a href="https://pick224.com/">Pick224</a>, a website containing data from over 15 hockey leagues across the world with a focus on junior hockey. Since the launch, the most common question I’ve been asked on <a href="https://twitter.com/davemacp">Twitter</a> has been “where do you get all this data from?”. I then explain how I scrape all the individual game summaries of each league, clean the data, total up all the stats, and join the results with player biographical information.</p>
+
+<p>This usually scares people off.</p>
+
+<p>I get it. Data collection, data cleaning, and data compilation can be daunting tasks. It’s hard to know where to start or what tools to use.</p>
+
+<p>My advice? Do <em>something</em>. Do a shitty job at it. Then, as you slowly begin to better understand your data and your needs, make small improvements. Eventually, you’ll have a great grasp of your data and some decent code.</p>
+
+<p>In this article, I’ll help you get started by recommending some tools and walking you through creating a basic web scraper.</p>
+
+<p>The code that follows is likely very inefficient, but should provide a good foundation.</p>
+
+<h2 id="technical-requirements">Technical requirements</h2>
+
+<p>To write our code, we’ll need the Python programming language and two extra libraries. I always fumble my way through installing programming languages, but the linked guides here should be pretty helpful:<br />
+• <a href="https://www.python.org/downloads/">Python3</a><br />
+• <a href="https://pypi.org/project/beautifulsoup4/">BeautifulSoup</a> (pip install bs4)<br />
+• <a href="https://pypi.org/project/requests/">Requests</a> (pip install requests)</p>
+
+<h2 id="understanding-the-data">Understanding the data</h2>
+
+<p>Before we start writing code, we need to know what data is available and what parts we need.</p>
+
+<p>For this example, let’s scrape the MHL, Russia’s junior hockey league.</p>
+
+<p>We can get everything we need from the individual game reports, an example of which can be found here: <a href="https://engmhl.khl.ru/game/857/83814/summary/">https://engmhl.khl.ru/game/857/83814/summary/</a></p>
+
+<p>We want to extract:<br />
+• Each individual goal and all its details from the “Scoring summary” tab; and<br />
+• Select information from each row of the “Players summary” tab</p>
+
+<p>If you open the URL above in Google Chrome, you can right-click on any part of the page and click “Inspect” to view the source code for that part of the webpage. If you highlight a section of code, it will highlight the relevant component of the webpage:</p>
+
+<p><img src="images/inspect-webpage-chrome.png" class = "img-responsive" width = "100%" alt="alt text" title="Inspecting with Chrome" /></p>
+
+<p>For example, if you highlight the code until the whole “Scoring summary” table is highlighted, you’ll see that the scoring summary is included in a “table” with the “class” <em>protocol-table</em>. If we search the rest of the code using ctrl+f (cmd+f on Macs) for “&lt;table”, we can see that there are 12 tables in the file. In order, these tables contain:<br />
+1. The scoring summary<br />
+2. The penalty summary<br />
+3. The home team’s goalies<br />
+4. The home team’s defensemen<br />
+5. The home team’s forwards<br />
+6. The away team’s goalies<br />
+7. The away team’s defensemen<br />
+8. The away team’s forwards<br />
+9. Team powerplay summaries<br />
+10. Team goals for summaries<br />
+11. Team goals against summaries<br />
+12. Team shot summaries</p>
+
+<p>To get what we want, we need to pull data from tables 1, 4, 5, 7, and 8.</p>
+
+<p>Further exploring our data, we can see that each individual row is enclosed in a “tr” tag and the individual cells of each row are enclosed in “td” tags. We’ll need a way to grab all the information from each of these cells.</p>
+
+<h2 id="writing-the-code">Writing the code</h2>
+
+<p>To get started, open up your Python programming interface. Python comes with one called IDLE, but there are lots of more customizable ones available. I use <a href="https://wingware.com/">Wing</a> because it’s what we used in the computer science program I made it 30% through ¯\_(ツ)_/¯.</p>
+
+<p>If using IDLE, click <em>File -&gt; New File</em> to open a blank file. Click <em>File -&gt; Save As</em> and save it as mhlscrape.py</p>
+
+<p>The first thing we need to do is import the necessary Python libraries. To do this, enter the three <em>import</em> lines seen in the below code snippet:</p>
+
+<script src="https://gist.github.com/davemacpherson/b43207caa813f7cc49db10840671a251.js"></script>
+
+<p>We’ll then save the URL of the webpage we want data from in a creatively-named variable, ‘url’. In a second variable called ‘response’, we use the <em>requests</em> library to request the relevant data from the webserver. Then, we use the <em>BeautifulSoup</em> library to extract all the source code in a readable format. The result of these three lines is that our ‘soup’ variable will contain the webpage’s entire source code:</p>
+
+<script src="https://gist.github.com/davemacpherson/ec2c68a35206e1e118bbbc2cefb35818.js"></script>
+
+<p>Next, we’ll extract the table we identified above as having the data we want. Most programming languages are silly and start with an index of zero, so our first table, the scoring summary, will be table zero. The <em>find_all</em> function finds all the tables and the [0] at the end grabs only the first table. We can then use <em>find_all</em> on this table to pull each row.</p>
+
+<p>https://gist.github.com/davemacpherson/15e602aacf0a26e8b478e46b0eb0b1a6#file-mhlscrape-py</p>
+
+<p>To store all the text from each cell, we create a blank list named ‘scoringplays’.</p>
+
+<p>Each row of the scoring summary has 10 columns. These would be numbered 0 to 9. We can use a “for” loop to iterate through each row and add each cell’s text to a list.</p>
+
+<blockquote>
+<p>for i in range(1, len(scorerows)):</p>
+</blockquote>
+
+<p>Any indented code following the colon will run for every row from row 1 to the last row. This intentionally skips the header row, row zero.</p>
+
+<p>To add each row’s contents to the list, we use <em>append.</em> This code would add the first cell of each row’s text to the ‘scoringplays’ list:</p>
+
+<blockquote>
+<p>scoringplays.append([scorerows[i].select(‘tr &gt; td’)[0].get_text(strip=True)])</p>
+</blockquote>
+
+<p>Since we want every cell, we’d expand this code to grab all 10 columns. You could exclude specific columns if you don’t need their data.</p>
+
+<script src="https://gist.github.com/davemacpherson/639102ffa74b35c2883d305fcbb0b213.js"></script>
+
+<p>We now have all our data stored in the ‘scoringplays’ list. The last step is writing this data to a file, which we can do using the following code:</p>
+
+<script src="https://gist.github.com/davemacpherson/f4b4e9537864db96e7c045f5d9639156.js"></script>
+
+<p>Putting all the code together, we have the following:</p>
+
+<script src="https://gist.github.com/davemacpherson/b24cfb7025fc3242bc84af868c14c55c.js"></script>
+
+<p>To summarize, this code pulls all of the individual goals from the webpage’s scoring summary and writes the data to a CSV file.</p>
+
+<p>To run the code in IDLE, click <em>Run -&gt; Run Module</em>. Open the resulting CSV file and take a look.</p>
+
+<h2 id="improving-the-code">Improving the code</h2>
+
+<p>Once we have the basic code working, here are some improvements we can make:<br />
+• Using the same concepts as above, pull the player data and write that data to a separate file<br />
+• Write a descriptive header to each file<br />
+• Add the game number to the output<br />
+• Enclose the code in a loop to pull multiple games each time you run the code <em>(note: If doing this, make sure to add a timed break between attempts so you don’t overload the website’s server)</em></p>
+
+<p>After these changes, here’s how the data shows up in our CSV file:</p>
+
+<p><img src="images/mhl-csv-file.png" class = "img-responsive" width = "100%" alt="alt text" title="CSV output" /></p>
+
+<p>As you run the code for more games, you’ll notice other changes you need to make. For example, <a href="https://engmhl.khl.ru/game/857/83808/summary/">a game that went to a shootout</a> has 13 tables instead of 12, and the shootout summary shows up in between the scoring summary and the player summaries, so you’ll need to account for that in your code.</p>
+
+<p>My current code for scraping the MHL is below:</p>
+
+<script src="https://gist.github.com/davemacpherson/a0fc802057e9c8fa48cdee37f262813a.js"></script>
+
+<p>After collecting the data, you’ll need to clean it up before you can get into any analysis. I’ll dive into some accessible methods for doing this in a future article.</p>
+
+<p>I hope this helps start you off with web scraping. If you have any questions, my DMs are open on <a href="https://twitter.com/davemacp">Twitter</a>.</p>
+
+<hr />
+
+<p><em>If web scraping isn’t for you and you’d rather jump right into data analysis, feel free to download any of the data available on</em> <a href="https://pick224.com/index.html"><em>Pick224</em></a><em>. If you do something cool with the data, please let me know!</em></p>    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+</div>
+</body></html>
