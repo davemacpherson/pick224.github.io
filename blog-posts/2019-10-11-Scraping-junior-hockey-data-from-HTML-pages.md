@@ -1,8 +1,6 @@
 Scraping junior hockey data from HTML pages
 ===========================================
 
-[![Dave MacPherson](https://miro.medium.com/fit/c/96/96/0*vQ6OsbHjqiKNB_6i.jpg)](https://medium.com/@dmacp?source=post_page-----be4df2c4dbbd----------------------)[Dave MacPherson](https://medium.com/@dmacp?source=post_page-----be4df2c4dbbd----------------------)Follow[Oct 11, 2019](https://medium.com/@dmacp/scraping-junior-hockey-data-be4df2c4dbbd?source=post_page-----be4df2c4dbbd----------------------) · 6 min read
-
 This past July, I launched [Pick224](https://pick224.com/), a website containing data from over 15 hockey leagues across the world with a focus on junior hockey. Since the launch, the most common question I’ve been asked on [Twitter](https://twitter.com/davemacp) has been “where do you get all this data from?”. I then explain how I scrape all the individual game summaries of each league, clean the data, total up all the stats, and join the results with player biographical information.
 
 This usually scares people off.
@@ -38,7 +36,7 @@ We want to extract:
 
 If you open the URL above in Google Chrome, you can right-click on any part of the page and click “Inspect” to view the source code for that part of the webpage. If you highlight a section of code, it will highlight the relevant component of the webpage:
 
-<img class="s t u hq ai" src="https://miro.medium.com/max/4080/1\*qIfpQ7k7\_VdKN5fTBuO1bw.png" width="2040" height="924" srcSet="https://miro.medium.com/max/552/1\*qIfpQ7k7\_VdKN5fTBuO1bw.png 276w, https://miro.medium.com/max/1104/1\*qIfpQ7k7\_VdKN5fTBuO1bw.png 552w, https://miro.medium.com/max/1280/1\*qIfpQ7k7\_VdKN5fTBuO1bw.png 640w, https://miro.medium.com/max/1400/1\*qIfpQ7k7\_VdKN5fTBuO1bw.png 700w" sizes="700px" role="presentation"/>
+<img class="s t u hq ai" src="images/inspect-webpage-chrome.png" width="2040" height="924" srcSet="images/inspect-webpage-chrome.png 276w, images/inspect-webpage-chrome.png 552w, images/inspect-webpage-chrome.png 640w, images/inspect-webpage-chrome.png 700w" sizes="700px" role="presentation"/>
 
 For example, if you highlight the code until the whole “Scoring summary” table is highlighted, you’ll see that the scoring summary is included in a “table” with the “class” _protocol-table_. If we search the rest of the code using ctrl+f (cmd+f on Macs) for “<table”, we can see that there are 12 tables in the file. In order, these tables contain:  
 1\. The scoring summary  
