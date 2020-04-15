@@ -36,7 +36,7 @@ We want to extract:
 
 If you open the URL above in Google Chrome, you can right-click on any part of the page and click “Inspect” to view the source code for that part of the webpage. If you highlight a section of code, it will highlight the relevant component of the webpage:
 
-<img class="s t u hq ai" src="images/inspect-webpage-chrome.png" width="2040" height="924" srcSet="images/inspect-webpage-chrome.png 276w, images/inspect-webpage-chrome.png 552w, images/inspect-webpage-chrome.png 640w, images/inspect-webpage-chrome.png 700w" sizes="700px" role="presentation"/>
+![alt text](images/inspect-webpage-chrome.png "Inspecting with Chrome")
 
 For example, if you highlight the code until the whole “Scoring summary” table is highlighted, you’ll see that the scoring summary is included in a “table” with the “class” _protocol-table_. If we search the rest of the code using ctrl+f (cmd+f on Macs) for “<table”, we can see that there are 12 tables in the file. In order, these tables contain:  
 1\. The scoring summary  
