@@ -69,7 +69,11 @@ The first thing we need to do is import the necessary Python libraries. To do th
 
 We’ll then save the URL of the webpage we want data from in a creatively-named variable, ‘url’. In a second variable called ‘response’, we use the _requests_ library to request the relevant data from the webserver. Then, we use the _BeautifulSoup_ library to extract all the source code in a readable format. The result of these three lines is that our ‘soup’ variable will contain the webpage’s entire source code:
 
+<script src="https://gist.github.com/davemacpherson/ec2c68a35206e1e118bbbc2cefb35818.js"></script>
+
 Next, we’ll extract the table we identified above as having the data we want. Most programming languages are silly and start with an index of zero, so our first table, the scoring summary, will be table zero. The _find\_all_ function finds all the tables and the \[0\] at the end grabs only the first table. We can then use _find\_all_ on this table to pull each row.
+
+https://gist.github.com/davemacpherson/15e602aacf0a26e8b478e46b0eb0b1a6#file-mhlscrape-py
 
 To store all the text from each cell, we create a blank list named ‘scoringplays’.
 
@@ -85,9 +89,15 @@ To add each row’s contents to the list, we use _append._ This code would add t
 
 Since we want every cell, we’d expand this code to grab all 10 columns. You could exclude specific columns if you don’t need their data.
 
+<script src="https://gist.github.com/davemacpherson/639102ffa74b35c2883d305fcbb0b213.js"></script>
+
 We now have all our data stored in the ‘scoringplays’ list. The last step is writing this data to a file, which we can do using the following code:
 
+<script src="https://gist.github.com/davemacpherson/f4b4e9537864db96e7c045f5d9639156.js"></script>
+
 Putting all the code together, we have the following:
+
+<script src="https://gist.github.com/davemacpherson/b24cfb7025fc3242bc84af868c14c55c.js"></script>
 
 To summarize, this code pulls all of the individual goals from the webpage’s scoring summary and writes the data to a CSV file.
 
@@ -109,6 +119,8 @@ After these changes, here’s how the data shows up in our CSV file:
 As you run the code for more games, you’ll notice other changes you need to make. For example, [a game that went to a shootout](https://engmhl.khl.ru/game/857/83808/summary/) has 13 tables instead of 12, and the shootout summary shows up in between the scoring summary and the player summaries, so you’ll need to account for that in your code.
 
 My current code for scraping the MHL is below:
+
+<script src="https://gist.github.com/davemacpherson/a0fc802057e9c8fa48cdee37f262813a.js"></script>
 
 After collecting the data, you’ll need to clean it up before you can get into any analysis. I’ll dive into some accessible methods for doing this in a future article.
 
