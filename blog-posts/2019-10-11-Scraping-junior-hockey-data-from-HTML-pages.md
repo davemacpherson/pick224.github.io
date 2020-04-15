@@ -1,28 +1,3 @@
-<html lang="en">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=.55, maximum-scale=.55, minimum-scale=.55, shrink-to-fit=no">
-  <meta name="description" content="How to scrape junior hockey data from HTML pages using Python">
-    <!-- Global site tag (gtag.js) - Google Analytics -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-143825138-1"></script>
-    <script>
-        window.dataLayer = window.dataLayer || [];
-
-        function gtag() {
-            dataLayer.push(arguments);
-        }
-        gtag('js', new Date());
-
-        gtag('config', 'UA-143825138-1');
-    </script>
-
-    <title>Pick224 - Scraping junior hockey data from HTML pages</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
-    <link rel="shortcut icon" type="image/png" href="/resources/favicon.gif" />
-    <link href="resources/css/starter-template.css" rel="stylesheet">
-</head>
-
-
 Scraping junior hockey data from HTML pages
 ===========================================
 
