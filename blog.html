@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -25,6 +24,8 @@
 </head>
 
 <body>
+
+  <!-- Navigation -->
   <nav class="navbar navbar-expand-md navbar-dark fixed-top" style = "z-index = 1200">
     <div class="logo" href="#"><img src="resources/pick224.gif" alt="Pick224" height="51" width="202"></div>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExampleDefault" aria-controls="navbarsExampleDefault" aria-expanded="false" aria-label="Toggle navigation">
@@ -48,15 +49,64 @@
           <a class="nav-link" href="pairings">Pairings</a>
         </li>
         <li class="nav-item active">
-          <a class="nav-link" href="#">Blog<span class="sr-only">(current)</span></a>
+          <a class="nav-link" href="blog">Blog<span class="sr-only">(current)</span></a>
         </li>
       </ul>
     </div>
   </nav>
-    <div id="medium-widget" class="container" style="width: 750px; margin: 10px auto; max-width: 750px;"></div>
-      <script src="https://medium-widget.pixelpoint.io/widget.js"></script>
-      <script>MediumWidget.Init({renderTo: '#medium-widget', params: {"resource":"https://medium.com/@dmacp","postsPerLine":2,"limit":6,"picture":"big","fields":["description","publishAt"],"ratio":"landscape"}})</script>
-      <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
-      <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
-      <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
-  </body></html>
+
+  <!-- Main Content -->
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-8 col-md-10 mx-auto">
+        <div class="post-preview">
+          <a href="blog-posts/2020-03-04-scraping-canadian-hockey-league-game-data.html">
+            <br>
+            <h4 class="post-title">
+              Scraping Canadian Hockey League (CHL) game data using Python
+            </h4>
+            <p><img src="blog-posts/images/chl-game-summary-tab.png" class = "img-responsive" width = "80%" height = "30%" alt="alt text" title="Scraping Canadian Hockey League (CHL) game data using Python" /></p>
+          </a>
+          <p class="post-meta">Posted by
+            Dave MacPherson
+            on Mar 4, 2020</p>
+        </div>
+        <hr>
+        <div class="post-preview">
+          <a href="blog-posts/2020-03-02-scraping-nuorten-sm-liiga-shot-attempts.html">
+            <h4 class="post-title">
+              Scraping Nuorten-SM Liiga shot attempts
+            </h4>
+            <p><img src="blog-posts/images/18-shot-game.png" class = "img-responsive" width = "80%" alt="alt text" title="Scraping Nuorten-SM Liiga shot attempts" /></p>
+            </a>
+          <p class="post-meta">Posted by
+            Dave MacPherson
+            on Mar 2, 2020</p>
+        </div>
+        <hr>
+        <div class="post-preview">
+          <a href="blog-posts/2019-10-11-Scraping-junior-hockey-data-from-HTML-pages.html">
+            <h4 class="post-title">
+              Scraping junior hockey data from HTML pages
+            </h4>
+          <p><img src="blog-posts/images/inspect-webpage-chrome.png" class = "img-responsive" width = "100%" alt="alt text" title="Scraping junior hockey data from HTML pages" /></p>
+          </a>
+          <p class="post-meta">Posted by
+            Dave MacPherson
+            on Oct 11, 2019</p>
+        </div>
+        <!-- Pager -->
+      </div>
+    </div>
+  </div>
+
+  <hr>
+
+  <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+
+
+</body>
+
+</html>
