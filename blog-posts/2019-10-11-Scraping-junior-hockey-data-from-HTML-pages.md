@@ -65,6 +65,8 @@ If using IDLE, click _File -> New File_ to open a blank file. Click _File -> Sav
 
 The first thing we need to do is import the necessary Python libraries. To do this, enter the three _import_ lines seen in the below code snippet:
 
+<script src="https://gist.github.com/davemacpherson/b43207caa813f7cc49db10840671a251.js"></script>
+
 We’ll then save the URL of the webpage we want data from in a creatively-named variable, ‘url’. In a second variable called ‘response’, we use the _requests_ library to request the relevant data from the webserver. Then, we use the _BeautifulSoup_ library to extract all the source code in a readable format. The result of these three lines is that our ‘soup’ variable will contain the webpage’s entire source code:
 
 Next, we’ll extract the table we identified above as having the data we want. Most programming languages are silly and start with an index of zero, so our first table, the scoring summary, will be table zero. The _find\_all_ function finds all the tables and the \[0\] at the end grabs only the first table. We can then use _find\_all_ on this table to pull each row.
@@ -102,7 +104,7 @@ Once we have the basic code working, here are some improvements we can make:
 
 After these changes, here’s how the data shows up in our CSV file:
 
-<img class="s t u hq ai" src="https://miro.medium.com/max/3444/1\*cWyAyLiDrPd2luRIzXhqiA.png" width="1722" height="454" srcSet="https://miro.medium.com/max/552/1\*cWyAyLiDrPd2luRIzXhqiA.png 276w, https://miro.medium.com/max/1104/1\*cWyAyLiDrPd2luRIzXhqiA.png 552w, https://miro.medium.com/max/1280/1\*cWyAyLiDrPd2luRIzXhqiA.png 640w, https://miro.medium.com/max/1400/1\*cWyAyLiDrPd2luRIzXhqiA.png 700w" sizes="700px" role="presentation"/>
+![alt text](images/mhl-csv-file.png "CSV output")
 
 As you run the code for more games, you’ll notice other changes you need to make. For example, [a game that went to a shootout](https://engmhl.khl.ru/game/857/83808/summary/) has 13 tables instead of 12, and the shootout summary shows up in between the scoring summary and the player summaries, so you’ll need to account for that in your code.
 
