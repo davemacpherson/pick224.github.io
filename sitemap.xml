@@ -31,16 +31,16 @@
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://pick224.com/dataviz19.html</loc>
-    <lastmod>2020-04-17</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
     <loc>https://pick224.com/totals</loc>
     <lastmod>2020-04-17</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://pick224.com/dataviz19.html</loc>
+    <lastmod>2020-04-17</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
   </url>
   <url>
     <loc>https://pick224.com/dataviz.html</loc>
@@ -73,13 +73,13 @@
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://pick224.com/blog-posts/2020-03-04-scraping-canadian-hockey-league-game-data.html</loc>
+    <loc>https://pick224.com/index.html</loc>
     <lastmod>2020-04-17</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://pick224.com/index.html</loc>
+    <loc>https://pick224.com/blog-posts/2020-03-04-scraping-canadian-hockey-league-game-data.html</loc>
     <lastmod>2020-04-17</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
