@@ -135,7 +135,7 @@
 <p>Each row of the scoring summary has 10 columns. These would be numbered 0 to 9. We can use a “for” loop to iterate through each row and add each cell’s text to a list.</p>
 
 <blockquote>
-<p>for i in range(1, len(scorerows)):</p>
+<p style="margin-left:5%; background-color:#F7F7F7;"><em>for i in range(1, len(scorerows)):</em></p>
 </blockquote>
 
 <p>Any indented code following the colon will run for every row from row 1 to the last row. This intentionally skips the header row, row zero.</p>
@@ -143,7 +143,7 @@
 <p>To add each row’s contents to the list, we use <em>append.</em> This code would add the first cell of each row’s text to the ‘scoringplays’ list:</p>
 
 <blockquote>
-<p>scoringplays.append([scorerows[i].select(‘tr &gt; td’)[0].get_text(strip=True)])</p>
+<p style="margin-left:5%; background-color:#F7F7F7"><em>scoringplays.append([scorerows[i].select(‘tr &gt; td’)[0].get_text(strip=True)])</p>
 </blockquote>
 
 <p>Since we want every cell, we’d expand this code to grab all 10 columns. You could exclude specific columns if you don’t need their data.</p>
