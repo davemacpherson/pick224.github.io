@@ -175,7 +175,7 @@
   <p>REGEXEXTRACT(L2, "[0–9]+") will pull only the numbers from the data in the specified cell. We can use this function to create columns that contain only the player ID for the scorer (G), the first assist (A1), and the second assist (A2). This formula will pull the data as a string instead of treating it like a number, so we can wrap it with a VALUE function to then treat the number as a number.</p>
 
   <p>For the assists, we’ll get an error if there was no assist. To avoid this, we can add an IF statement to the formula. If the cell containing the assist data is empty, we will return an empty string instead of trying to pull something from nothing:
-  <ul><li>>=IF(M2="", "", VALUE(REGEXEXTRACT(M2, "[0–9]+")))</li></ul></p>
+  <ul><li>=IF(M2="", "", VALUE(REGEXEXTRACT(M2, "[0–9]+")))</li></ul></p>
 
   <p>The only remaining thing we’ll need for each goal is to pull which players were on the ice when it was scored. First, we’ll need to clean up the <i>PlusMin</i> tab.</p>
 
