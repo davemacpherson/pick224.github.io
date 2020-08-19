@@ -63,15 +63,15 @@
 
   <p>Since launching, I’ve written blogs on how to scrape hockey data, whether from <a href="https://pick224.com/blog-posts/2019-10-11-Scraping-junior-hockey-data-from-HTML-pages.html" target="_blank">HTML web pages</a> or sites that use <a href="https://pick224.com/blog-posts/2020-03-04-scraping-canadian-hockey-league-game-data.html" target="_blank">JSON</a>. I’ve since gotten a lot of questions from scouts and others who work in hockey asking about the next steps: cleaning and summarizing data. </p>
 
-  <p>If you have some experience with Excel or Google Sheets and don't want to start learning a programming language like R or Python, but still want to get shit done, this article is for you. Excel and Google Sheets are powerful tools, and it’s okay if you’re not ready to learn a programming language. After you get a good understanding of the things you can do with data, you can then decide if you would like to do those things more efficiently and effectively using R or Python. You may also want to start with R or Python if you're working on a project with more data than Google Sheets or Excel can handle.</p>
+  <p>If you have some experience with Excel or Google Sheets and don't want to start learning a programming language like R or Python, but still want to get shit done, this post is for you. Excel and Google Sheets are powerful tools, and it’s okay if you’re not ready to learn a programming language. After you get a good understanding of the things you can do with data, you can then decide if you would like to do those things more efficiently and effectively using R or Python. You may also want to start with R or Python if you're working on a project with more data than Google Sheets or Excel can handle.</p>
 
-  <p>In this article, I’ll walk through the whole process of turning raw hockey data into the summarized player totals you see on Pick224, all using Google Sheets. When I first launched Pick224, my database was entirely built using the methods below.</p>
+  <p>In the following sections, I’ll walk through the whole process of turning raw hockey data into the summarized player totals you see on Pick224, all using Google Sheets. When I first launched Pick224, my database was entirely built using the methods below.</p>
 
   <p>I recommend following along and working through the formulas. <a href="https://docs.google.com/spreadsheets/d/1Fm6zW89NP_X5N2TPjc7UlG6jDmixccI9LKJ7vFHHGfo" target="_blank">Here’s a file</a> containing only the raw data that you can make a copy of and follow along with, and <a href="https://docs.google.com/spreadsheets/d/11ab2nlcQicVeJ7N3dXAxLkzjIGOnRuB7lKU120I07vY" target="_blank">here’s a copy of a final file</a>, after having worked through everything below.</p>
 
   <p><strong>The raw data</strong></p>
 
-  <p> To prepare for this article, I wrote some scrapers to pull everything I needed from the Czech U20 league’s 2020 season. This data includes: </p>
+  <p> To prepare for this write-up, I wrote some scrapers to pull everything I needed from the Czech U20 league’s 2020 season. This data includes: </p>
 
   <ul>
     <li>A schedule of all games, containing a unique identifier for each game</li>
