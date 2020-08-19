@@ -1,0 +1,374 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=.55, maximum-scale=.55, minimum-scale=.55, shrink-to-fit=no">
+  <meta name="description" content="Scraping junior hockey data from HTML pages using Python">
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-143825138-1"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+
+        function gtag() {
+            dataLayer.push(arguments);
+        }
+        gtag('js', new Date());
+
+        gtag('config', 'UA-143825138-1');
+    </script>
+
+    <title>Pick224 - Hockey Prospect Stats - Scraping junior hockey data</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link rel="shortcut icon" type="image/png" href="https://pick224.com//resources/favicon.gif" />
+    <link href="https://pick224.com/resources/css/starter-template.css" rel="stylesheet">
+</head>
+
+<body>
+  <nav class="navbar navbar-expand-md navbar-dark fixed-top" style = "z-index = 1200">
+    <div class="logo" href="#"><img src="https://pick224.com/resources/pick224.gif" alt="Pick224" height="51" width="202"></div>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExampleDefault" aria-controls="navbarsExampleDefault" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarsExampleDefault" style = "z-index = 1200">
+      <ul class="navbar-nav mr-auto">
+        <li class="nav-item">
+          <a class="nav-link" href="https://pick224.com">Home</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="https://pick224.com/dataviz">Viz</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="https://pick224.com/pairings">Pairings</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="goalies">Goalies</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="https://pick224.com/women">Women</a>
+        </li>
+        <li class="nav-item active">
+          <a class="nav-link" href="https://pick224.com/blog">Blog<span class="sr-only">(current)</span></a>
+        </li>
+      </ul>
+    </div>
+  </nav>
+
+<div class="container">
+  <h2 id="cleaning-and-summarizing-hockey-data-with-google-sheets-microsoft-excel">Cleaning and Summarizing Hockey Data with Google Sheets or Microsoft Excel</h2>
+  <p><em>By Dave MacPherson | Posted Aug 19, 2020</p></em>
+  <hr>
+
+  <p>In July 2019, I launched <a href="https://pick224.com/" target="_blank">Pick224</a>, a hockey analytics website containing data from over 15 hockey leagues across the world with a focus on junior hockey and the NHL draft. To compile this data, I first scrape all the individual game summaries of each league, then clean the data, total up all the stats, and join the results with each player’s biographical information. </p>
+
+  <p>Since launching, I’ve written blogs on how to scrape hockey data, whether from <a href="https://pick224.com/blog-posts/2019-10-11-Scraping-junior-hockey-data-from-HTML-pages.html" target="_blank">HTML web pages</a> or sites that use <a href="https://pick224.com/blog-posts/2020-03-04-scraping-canadian-hockey-league-game-data.html" target="_blank">JSON</a>. I’ve since gotten a lot of questions from scouts and others who work in hockey asking about the next steps: cleaning and summarizing data. </p>
+
+  <p>If you have some experience with Excel or Google Sheets, aren’t yet comfortable getting started with a programming language like R or Python for data analysis, but still want to get shit done, this article is for you. Excel and Google Sheets are powerful tools, and it’s okay if you’re not ready to learn a programming language right now. After you get a good understanding of the things you can do with data, you can then venture on and learn R and/or Python if you’d like to do those things more efficiently and effectively.</p>
+
+  <p>In this article, I’ll walk through the whole process of turning raw hockey data into the summarized player totals you see on Pick224, all using Google Sheets. When I first launched Pick224, my database was entirely built using the methods below.</p>
+
+  <p>I recommend following along and working through the formulas. <a href="https://pick224.com/blog-posts/2019-10-11-Scraping-junior-hockey-data-from-HTML-pages.html" target="_blank">Here’s a file</a> containing only the raw data that you can make a copy of and follow along with, and <a href="https://pick224.com/blog-posts/2019-10-11-Scraping-junior-hockey-data-from-HTML-pages.html" target="_blank">here’s a copy of a final file</a>, after having worked through everything below.</p>
+
+  <p>If you’re already fully comfortable cleaning and summarizing data using Microsoft Excel, I recommend skipping this article and checking out <a href="https://twitter.com/MeghanMHall" target="_blank">Meghan Hall</a>’s great work on <a href="https://meghan.rbind.io/talk/hanic/" target="_blank">moving beyond Excel for hockey analysis</a> instead.</p>
+
+  <p><strong>The Raw Data</strong></p>
+
+  <p> To prepare for this article, I wrote some scrapers to pull everything I needed from the Czech U20 league’s 2020 season. This data includes: </p>
+
+  <ul>
+    <li>A schedule of all games, containing a unique identifier for each game</li>
+    <ul><li><i>Fields</i>: GAME_ID, HOME_TEAM, AWAY_TEAM</li></ul>
+    <li>A listing of each team’s roster for every game</li>
+    <ul><li><i>Fields</i>: GAME_ID, H_A (Home or Away team), J_NO (jersey number), POS (position), NAME, PLAYER_URL</li></ul>
+    <li>A listing of all goals scored</li>
+    <ul><li><i>Fields</i>: GAME_ID, GOAL_ID, TEAM, SCORER, ASSISTS, STR (goal strength), PLAYER_URLS</li></ul>
+    <li>A listing of all players who were on the ice for each goal scored</li>
+    <ul><li><i>Fields</i>: GAME_ID, GOAL_ID, PLUS_OR_MINUS, PLAYER_IDS</li></ul>
+  </ul>
+
+  <p><strong>The Raw Data</strong></p>
+
+  <p>Using all of this raw data, we will be calculating the following season stats for each player who played at least one game:</p>
+  <ul>
+    <li>GP - games played</li>
+    <li>EV_G - even-strength goals</li>
+    <li>EV_A1 - even-strength primary assists</li>
+    <li>EV_A2 - even-strength secondary assists</li>
+    <li>PP_G - powerplay goals</li>
+    <li>PP_A1 - powerplay primary assists</li>
+    <li>PP_A2 - powerplay secondary assists</li>
+    <li>SH_G - shorthanded goals</li>
+    <li>SH_A1 - shorthanded primary assists</li>
+    <li>SH_A2 - shorthanded secondary assists</li>
+    <li>EV_GF - the number of even-strength goals the player’s team scored while the player was on the ice</li>
+    <li>EV_GA - the number of even-strength goals scored against the player’s team while the player was on the ice</li>
+    <li>OFF_EV_GF - the number of even-strength goals the player’s team scored while the player was not on the ice</li>
+    <li>OFF_EV_GA - the number of even-strength goals scored against the player’s team while the player was not on the ice</li>
+    <li>EV GF% - the percentage of even-strength goals scored by the player’s team while the player was on the ice</li>
+    <li>EV GF%Rel - the player’s EV GF% minus the percentage of even-strength goals scored by the player’s team while the player was not on the ice</li>
+  </ul>
+
+  <p><strong>The Initial Setup</strong></p>
+  <p>Since we have all of our raw data, we’ll get started by creating a new Google Sheets spreadsheet. If you’re using Google Chrome and are logged in to a Google account, type <i>sheets.new</i> in the URL bar and hit enter to create a new file. Otherwise, sign in to Google Drive or create an account <a href="https://drive.google.com/" target="_blank">here</a>, then create a new Google Sheets spreadsheet.</p>
+
+  <p>We’ll start by creating the following new sheets ("tabs") and pasting in our raw data:</p>
+  <ul>
+  <li>Schedule</li>
+  <li>GP</li>
+  <li>Goals</li>
+  <li>PlusMin</li>
+  </ul>
+
+  <p>From looking through the data, we can see where the connections are between the different sheets. Each game has a unique GAME_ID, each goal a GAME_ID and a GOAL_ID, and each player a unique PLAYER_ID. We’ll be using the connections between the sheets to compile our data.</p>
+
+  <p><strong>The Functions We’ll Use</strong></p>
+
+  <p>We’ll be using a lot of different Google Sheets functions throughout this exercise. Most of these functions and formulas can also be used in Excel, although some may function differently. Here’s a brief summary:</p>
+  <ul>
+  <li>VLOOKUP: find a specified item in another place and return related data</li>
+  <li>SUMIFS: add up a range based on specified criteria</li>
+  <li>COUNTIF: count the number of cells that meet a specified criteria</li>
+  <li>MID: extract a portion of a string of text</li>
+  <li>VALUE: convert a string of text into a number</li>
+  <li>IF: if certain criteria is met, do something specified</li>
+  <li>REGEXEXTRACT: extract a portion of a string of text based on a pattern</li>
+  <li>REGEXMATCH: check whether or not a specified pattern exists in a string of text</li>
+  <li>REGEXREPLACE: replace a portion of a string with another</li>
+  <li>&: combine strings of text</li>
+  <li>JOIN: combine strings of text, with a specified separator between each</li>
+  <li>SPLIT: split strings of text based on a separator</li>
+  <li>PROPER: convert a string from any case to "Proper Noun" case</li>
+  <li>SORT: sort a range of data</li>
+  <li>UNIQUE: extract only the unique values from a range of data</li>
+  <li>ARRAYFORMULA: allows us to use functions on a range that we would generally only be able to use on one cell</li>
+  <li>IFERROR: allows us to specify what to do if our formula would otherwise result in an error</li>
+  <li>ROUND: round a number to the specified number of decimal places</li>
+  </ul>
+
+  <p><strong>Cleaning the Data</strong></p>
+
+  <p><strong><em>The Goals tab</em></strong></p>
+
+  <p>Starting with the <i>Goals</i> tab, let’s clean up the data and get it ready to be summarized.</p>
+
+  <p>The STR field contains how many players were on the ice for each team. We can use this to determine whether each goal was scored at even-strength, on the powerplay, or while shorthanded. The data is set up with the number of players on the ice for the scoring team, then the number of players on the ice for the other team, with the two separated by a slash and surrounded in square brackets. We can determine the strength of the play by checking whether the first number is greater than, equal to, or less than the second number. To do this, we’ll use an IF function. If the first number is greater than the second number, it’s a powerplay goal. If the first number is equal to the second number, it’s an even-strength goal. If the first number is less than the second number, it’s a shorthanded goal. To extract the numbers, we can use the MID function:
+
+  <ul><li>=MID(data, the character to start with, how many characters to extract)</li></ul></p>
+
+  <p>So =MID("[5/4]", 2, 1) would equal 5, and =MID("[5/4]", 4, 1) would equal 4. We can wrap the MID function with a VALUE function to convert the amount to a number instead of it being treated like a string. Then to compare the two numbers, we can use the IF function:
+  <ul><li>=IF(specified condition, do this, otherwise do this)</li>
+  <li>=IF(5 > 4, "PP", "Not PP")</li></ul></p>
+
+  <p>With the first STR entry in F2, we can use this formula:
+  <ul><li>=IF(VALUE(MID(F2, 2, 1))=VALUE(MID(F2, 4, 1)), "EV", IF(VALUE(MID(F2, 2, 1))>VALUE(MID(F2, 4, 1)), "PP", IF(VALUE(MID(F2, 2, 1))<VALUE(MID(F2, 4, 1)), "SH", "ERROR")))</li></ul></p>
+
+  <p>We’ll then create new columns (EV, PP, SH) to later use for counting up all the goals of different strengths. This is also done with IF formulas, like this one:
+  <ul><li>=IF(H2="PP", 1, 0)</li></ul></p>
+
+  <p>The SCORER data contains the player's name and then the goals to date in parentheses, and the ASSISTS data contains up to two assisting players separated by a comma and their assists to date in parentheses. The PLAYER_URLS data is made up of the HTML for those two fields, and includes a URL for each player. For example, here is one entry from the PLAYER_URLS field:</p>
+  <ul><li>[&lt;a href="/hrac/38921"&gt;David SÝKORA &lt;span class="text-13pt"&gt;(1)&lt;/span&gt;&lt;/a&gt;, &lt;a href="/hrac/10083718"&gt;Ján PETRISKA &lt;span class="text-13pt"&gt;(4)&lt;/span&gt;&lt;/a&gt;, &lt;a href="/hrac/10081997"&gt;Jan ZÁVORA &lt;span class="text-13pt"&gt;(3)&lt;/span&gt;&lt;/a&gt;]</li></ul>
+
+  <p>This data contains something very useful: a unique identifier for each player. The "/hrac/38921" is from a URL linking to the player’s bio page on the league website. For example, <a href="https://www.hokej.cz/hrac/38921" target="_blank">https://www.hokej.cz/hrac/38921</a></p>
+
+  <p>Since we know each player’s identifier will be unique, we can use this instead of the player’s name so we won’t run into any issues if two players have the same name. So let’s extract the player ID for each player involved in each goal. We can see that each player is separated by a comma, so we can use the SPLIT function to split up the data and put each player into their own column.</p>
+
+  <p>=SPLIT(G2, ",") will create three columns: one for the scorer, one for the primary assist, and one for the secondary assist. We don’t need <i>&lt;a href="/hrac/38921"&gt;David SÝKORA &lt;span class="text-13pt"&gt;(1)&lt;/span&gt;&lt;/a&gt;</i>, though — we just need the number. To get this, we can use the REGEXEXTRACT function, which allows us to specify a pattern that we want to extract from a text string:</p>
+
+  <p>REGEXEXTRACT(L2, "[0–9]+") will pull only the numbers from the data in the specified cell. We can use this function to create columns that contain only the player ID for the scorer (G), the first assist (A1), and the second assist (A2). This formula will pull the data as a string instead of treating it like a number, so we can wrap it with a VALUE function to then treat the number as a number.</p>
+
+  <p>For the assists, we’ll get an error if there was no assist. To avoid this, we can add an IF statement to the formula. If the cell containing the assist data is empty, we will return an empty string instead of trying to pull something from nothing:
+  <ul><li>>=IF(M2="", "", VALUE(REGEXEXTRACT(M2, "[0–9]+")))</li></ul></p>
+
+  <p>The only remaining thing we’ll need for each goal is to pull which players were on the ice when it was scored. First, we’ll need to clean up the <i>PlusMin</i> tab.</p>
+
+  <p><strong><em>The PlusMin tab</em></strong></p>
+
+  <p>The <i>PlusMin</i> tab contains each goal from each game and the players who were on the ice when the goals were scored. There are two rows for each goal: one containing the players from the scoring team who were on the ice, and another containing the players who were on the ice for the team that got scored on.</p>
+
+  <p>I was lazy when scraping this data, so all we have is an HTML blob identifying the plus or minus row and another containing the player ID for all the players who were on the ice for that plus or minus.</p>
+
+  <p>First, we can create columns that identify whether each row is a PLUS row or a MINUS one. There are only two possibilities, so we can set up these formulas:
+  <ul><li>PLUS = IF(C2="[&lt;i class="fa fa-plus c-green"&gt;&lt;/i&gt;]", 1, 0)</li>
+  <li>MINUS = IF(C2="[&lt;i class="fa fa-minus c-red"&gt;&lt;/i&gt;]", 1, 0)</li></ul></p>
+
+  <p>We’ll then create a unique identifier for each row so we can add this data to our <i>Goals</i> tab. The unique identifier will be a combination of the GAME_ID, the GOAL_ID, and whether it’s a plus or a minus row. For example, 2874561|1|P would be the plus row for the first goal of game #2874561. We can combine different fields into one string by using the ampersand (&):
+  <ul><li>=A2 & "|" & B2 & "|" & IF (E2=1, "P", "M")</li></ul></p>
+
+  <p>We then need to pull each player ID. We can do this using the same SPLIT and REGEXEXTRACT functions we used in the <i>Goals</i> tab. We’ll then combine all the player IDs into one cell, which we can later use to count how many goals a player was on the ice for. Since player IDs can vary in length, we need to make sure player #38921 will not be included in calculations concerning player #1038921. To do this, we’ll put a "P" or "M" before each player ID and an "X" after.</p>
+
+  <ul>
+  <li>D2 = [&lt;a href="/hrac/10081997"&gt;Jan Závora&lt;/a&gt;, &lt;a href="/hrac/38921"&gt;David Sýkora&lt;/a&gt;, &lt;a href="/hrac/9455551"&gt;Andrej Moravčík&lt;/a&gt;, &lt;a href="/hrac/49931"&gt;Samuel Dotter&lt;/a&gt;, &lt;a href="/hrac/9416915"&gt;Miroslav Vasilev&lt;/a&gt;, &lt;a href="/hrac/4220467"&gt;Tadeáš Zeithaml&lt;/a&gt;]</li>
+  <li>E2 = a one for plusses, or a zero for minuses</li>
+  <li>O2 = [&lt;a href="/hrac/10081997"&gt;Jan Závora&lt;/a&gt;
+  <br>=split(D2, ",")</li>
+  <li>I2 = P10081997X
+  <br>=IF(O2="", "", IF(E2=1, "P" & REGEXEXTRACT(O2, "[0–9]+") & "X", "M" & REGEXEXTRACT((O2, "[0–9]+") & "X"))</li>
+  </ul>
+
+  <p>We can then combine the player IDs using the JOIN function, choosing we’ll choose a pipe as the separator between each player ID:
+  <ul><li>=JOIN("|", I2:N2)</li></ul></p>
+
+  <p>This leaves us with data that looks like the following, which we’ll then join to the goal data:
+  <ul><li>P10081997X|P38921X|P9455551X|P49931X|P9416915X|P4220467X</li></ul></p>
+
+  <p><strong><em>The Goals tab, revisited</em></strong></p>
+
+  <p>Since the unique identifier we created in the <i>PlusMin</i> tab is a combination of the GAME_ID, the GOAL_ID, and whether it’s a plus or a minus row, we’ll need to create something similar in the <i>Goals</i> tab:
+  <ul><li>=GAME_ID & "|" & GOAL_ID</ul></li></p>
+
+  <p>We can then use the VLOOKUP function to pull the plusses and minuses. Where the unique identifier is in column G of the <i>PlusMin</i> tab and the data we want to extract is in column H of the <i>PlusMin</i> tab, here’s how we can get the data:
+  <ul><li>=VLOOKUP(the identifier you want to find, the range you want to find it in, the column you want to extract, whether you’re okay with an approximate match or not)</li>
+
+  <ul>
+  <li>The identifier we want to find is the combination of the GAME_ID and GOAL_ID we made above, but we’ll be adding a "|P" for plusses and a "|M" for minuses. In this case, it’s in column R.</li>
+  <li>The range we want to find it in is PlusMin!G:H</li>
+  <li>The data we want to pull is in the second column of the range</li>
+  <li>We are not cool with pulling approximate matches</li>
+  </ul></ul>
+  </p>
+  <p>
+  <ul><li>PLUSSES =VLOOKUP(R2 & "|P", PlusMin!G:H, 2, FALSE)</li>
+  <li>MINUSES =VLOOKUP(R2 & "|M", PlusMin!G:H, 2, FALSE)</ul>
+  </p>
+
+  <p><strong><em>The Teams tab</em></strong></p>
+
+  <p>You may have noticed that the <i>Schedule</i> tab has the team IDs in long form, like "J Slavia Praha", but the <i>Goals</i> tab has only three letters for each team, like "SLA". The <i>GP</i> tab only indicates whether the player was on the home or away team and doesn’t include any form of the team name. To bridge these gaps, let’s create a <i>Teams</i> tab. This tab will simply be a mapping, created manually, matching up the long-form names with the short-form ones:</p>
+
+  <center><p><img src="images/google-sheets-team-mapping.png" class = "img-responsive" width = "25%" alt="alt text" title="Czech U20 team mapping" /></p></center>
+
+  <p>We’ll use this tab in the below sections.</p>
+
+  <p><strong><em>The Schedule tab</em></strong></p>
+  <p>As mentioned above, we need to grab the three-letter team name for each team on the schedule. We can again use VLOOKUP here. With the home team in column B and the away team in column C:</p>
+  <ul>
+  <li>HOME_SHORT =VLOOKUP(B2, Teams!A:B, 2, FALSE)</li>
+  <li>AWAY_SHORT =VLOOKUP(C2, Teams!A:B, 2, FALSE)</li>
+  </ul>
+
+  <p>We’ll use this data in the next section.</p>
+
+  <p><strong><em>The GP tab</em></strong></p>
+  <p>The <i>GP</i> tab is a full listing of every player who appeared in each game, so it has many more rows than any of the previous tabs. There were a total of 11,703 player games played in the 2019–20 season of the Czech U20 league. We’ll use this tab to calculate a lot of the stats mentioned in the "Goals" section above on a per-game basis, which we’ll then use to calculate season totals.</p>
+
+  <p>We already know how to pull the PLAYER_ID from the PLAYER_URL column:
+  <ul><li>=VALUE(REGEXEXTRACT(F2, "[0–9]+"))</li></ul></p>
+
+  <p>Since all the team information we have is whether the player was on the home team or the away team, let’s use VLOOKUP to pull the three-letter team name and the opponent’s team name. If the player was on the home team, pull the home team from the <i>Schedule</i> tab. Otherwise, pull the away team:</p>
+  <ul>
+  <li>TEAM =IF(B2="H", VLOOKUP(A2, Schedule!A:E, 4, FALSE), VLOOKUP(A2, Schedule!A:E, 5, FALSE))</li>
+  <li>OPP =IF(B2="H", VLOOKUP(A2, Schedule!A:E, 5, FALSE), VLOOKUP(A2, Schedule!A:E, 4, FALSE))</li>
+  </ul></p>
+
+  <p>Next, we can use the SUMIFS function to total up all the values we’ll need for the GF and GA stats we want:
+
+  <ul><li>SUMIFS(the range you want to sum up, a range you want to test against specified criteria, the criteria you want the range to meet, a second range you want to test against specified criteria, the criteria you want the second range to meet)</li></ul></p>
+
+  <p>For example, let’s say you want to total up how many apples you sold from a list of all fruits sold, with the item sold in column A and the quantity sold in column B:</p>
+
+  <center><p><img src="images/google-sheets-sumifs-example.png" class = "img-responsive" width = "25%" alt="alt text" title="SUMIFS example for Google Sheets" /></p></center>
+
+  <p>=SUMIFS(A:A, B:B, "Apple") will get you the total apples sold.</p>
+
+  <p>For each player and each game, we’ll need to calculate how many even-strength goals the player was on the ice for, how many even-strength goals each team scored, and the number of even-strength goals that were scored while the player was not on the ice. We’ll be summarizing data from the <i>Goals</i> tab. The relevant data is in the following ranges:</p>
+  <ul>
+  <li>Even-strength goals: column I of the <i>Goals</i> tab has a 1 for each even-strength goal</li>
+  <li>GAME_ID: column A of the <i>Goals</i> tab</li>
+  <li>The scoring team: column C of the <i>Goals</i> tab</li>
+  </ul>
+
+  <p>To total up the number of even-strength goals scored by or against the player’s team in a game, we would sum column I (EV) of the <i>Goals</i> tab column for any goals that were scored in the same game by the player’s team or the opposing team. So our two criteria will be the GAME_ID and the TEAM:
+  <ul>
+  <li>TEAM_EV_GF =SUMIFS(Goals!I:I, Goals!A:A, A2, Goals!C:C, I2)</li>
+  <li>TEAM_EV_GA =SUMIFS(Goals!I:I, Goals!A:A, A2, Goals!C:C, J2)</li>
+  </ul>
+  </p>
+
+  <p>To calculate how many even-strength goals the player was on the ice for, we’ll use the PLUSSES (column S) and MINUSES (column T) columns we set up earlier in the <i>Goals</i> tab. To do this, we’ll use REGEXMATCH to see whether the player’s PLAYER_ID (starting with a P or M and ending with an X) is found in the PLUSSES column or the MINUSES column. REGEXMATCH will return "TRUE" if a match is found, or "FALSE" if a match is not found. However, if we try to use the REGEXMATCH function on our PLUSSES column, we’ll hit an error. To avoid this, we need to wrap our whole formula with ARRAYFORMULA, which allows us to use functions on a range that we would otherwise only be able to use on one cell:</p>
+  <ul>
+  <li>PL_EV_GF =ARRAYFORMULA(SUMIFS(Goals!I:I, Goals!A:A, A2, REGEXMATCH(Goals!S:S,"P"&H2&"X"),TRUE))</li>
+  <li>PL_EV_GA =ARRAYFORMULA(SUMIFS(Goals!I:I, Goals!A:A, A2, REGEXMATCH(Goals!T:T,"M"&H2&"X"),TRUE))</li>
+  </ul>
+
+  <p>To calculate the number of even-strength goals that were scored for or against a player’s team while the player was not on the ice, we can simply subtract the PL_EV_GX numbers from the TEAM_EV_GX ones.</p>
+
+  <p><strong>Summarizing all of the data</strong></p>
+  <p><strong><em>Creating a list of players</em></strong></p>
+
+  <p>We now have everything we need to calculate season totals for each player. To do this, let’s create a new tab named Totals.</p>
+
+  <p>We want to summarize the 11,702 rows from the <i>GP</i> tab and the 2,150 goals scored into one row for each player. To do this, we’ll use the UNIQUE function. In column A of our <i>Totals</i> tab, we can use this formula to pull only one row each player who played in at least one game in the season:
+  <ul><li>=UNIQUE(GP!H2:H)</li></ul></p>
+
+  <p>To pull the player’s name in addition to their player ID, we can specify a second column and encapsulate the two ranges in curly braces:
+  <ul><li>=UNIQUE({GP!H2:H, GP!E2:E})</li></ul></p>
+
+  <p>If we want to sort this list of players in alphabetical order, we can use the SORT function:
+  <ul><li>=SORT(data range you want to sort, the number of the column you want to sort by, a TRUE if you want to sort in ascending order or a FALSE if you want to sort in descending order)</li></ul></p>
+
+  <p>Since the player names are in the second column, we can specify that we want to sort the range by the second column:
+  <ul><li>=SORT(UNIQUE({GP!H2:H, GP!E2:E}), 2, TRUE)</li></ul></p>
+
+  <p>Looking at the player names, we’ll see that the last names are in capital letters and there are a lot of diacritics, or accented letters. For example: David SÝKORA</p>
+
+  <p>If we want to convert this to "David Sykora", we can use a combination of PROPER and REGEXREPLACE:
+  <ul><li>=PROPER(David SÝKORA) = David Sýkora</li>
+  <li>=REGEXREPLACE(David Sýkora, "ý", "y" = David Sykora</li></ul></p>
+
+  <p>If there are multiple versions of one letter with different diacritics, we can enter them in the REGEXREPLACE formula in parentheses and separated by the pipe character:
+  <ul><li>=REGEXREPLACE(cell containing text, "(ò|ó|ô|õ|ö|ø|ð)", "o")</li></ul></p>
+
+  <p>I’ve come across a lot of different diacritics doing this work, so the current version of this formula is huge and grotesque:
+  <ul><li>=REGEXREPLACE(REGEXREPLACE(REGEXREPLACE (REGEXREPLACE(REGEXREPLACE(REGEXREPLACE (REGEXREPLACE(REGEXREPLACE(REGEXREPLACE (REGEXREPLACE(REGEXREPLACE(REGEXREPLACE (REGEXREPLACE(REGEXREPLACE(REGEXREPLACE (REGEXREPLACE(REGEXREPLACE(REGEXREPLACE (REGEXREPLACE(REGEXREPLACE(REGEXREPLACE (REGEXREPLACE(REGEXREPLACE(REGEXREPLACE (REGEXREPLACE(REGEXREPLACE(proper(B2), "(À|Á|Â|Ã|Ä|Å)", "A"), "(à|á|â|ã|ä|å)", "a"), "(Ò|Ó|Ô|Õ|Õ|Ö|Ø)", "O"), "(ò|ó|ô|õ|ö|ø|ð)", "o"), "(È|É|Ê|Ë)", "E"), "(è|é|ê|ë|ě)", "e"), "(Ç|Č)", "C"), "(ç|č)", "c"), "Ð", "D"), "(Ì|Í|Î|Ï|ì|í|î|ï|i)", "i"), "(Ù|Ú|Û|Ü)", "U"), "(ù|ú|û|ü|ů)", "u"), "Ñ", "N"), "(ň|ñ)", "n"), "Š", "S"), "š", "s"), "Ÿ", "Y"), "ý", "y"), "ř", "r"), "ž", "z"), "Ž", "Z"), "ť", "t"), "Ř", "R"), "Ď", "D"), "ď", "d"), "Ľ", "L")</li></ul></p>
+
+  <p><strong><em>Calculating totals</em></strong></p>
+
+  <p>The majority of our totals can be calculated using the SUMIFS function. One exception is games played ("GP"), which we’ll instead use COUNTIF for:
+  <ul><li>=COUNTIF(range you want to check, criteria that needs to be met in order to be counted)</li></ul></p>
+
+  <p>For example, if the PLAYER_ID of the player we want to calculate games played for is in cell A2, and the PLAYER_ID field in our <i>GP</i> tab is in column H, the following formula would calculate that player’s games played:
+  <ul><li>=COUNTIF(GP!H:H, A2)</li></ul></p>
+
+  <p>As mentioned above, SUMIFS can be used for the majority of the other totals. One thing you may notice if you’re copy-pasting formulas from one column to another is that Google Sheets will automatically shift your formula over. So if you’re summing column G in one formula, but then paste that formula one column to the right, Google Sheets will automatically make the new formula sum column H. To avoid this, add dollar signs in front of your cell and range references to lock them when copy-pasting.</p>
+
+  <ul>
+  <li>E: EV_G =SUMIFS(Goals!I:I, Goals!O:O, A2)</li>
+  <li>F: EV_A1 =SUMIFS(Goals!I:I, Goals!P:P, A2)</li>
+  <li>G: EV_A2 =SUMIFS(Goals!I:I, Goals!Q:Q, A2)</li>
+  <li>H: PP_G =SUMIFS(Goals!J:J, Goals!O:O, A2)</li>
+  <li>I: PP_A1 =SUMIFS(Goals!J:J, Goals!P:P, A2)</li>
+  <li>J: PP_A2 =SUMIFS(Goals!J:J, Goals!Q:Q, A2)</li>
+  <li>K: SH_G =SUMIFS(Goals!K:K, Goals!O:O, A2)</li>
+  <li>L: SH_A1 =SUMIFS(Goals!K:K, Goals!P:P, A2)</li>
+  <li>M: SH_A2 =SUMIFS(Goals!K:K, Goals!Q:Q, A2)</li>
+  <li>N: EV_GF =SUMIFS(GP!M:M, GP!H:H, A2)</li>
+  <li>O: EV_GA =SUMIFS(GP!N:N, GP!H:H, A2)</li>
+  <li>P: OFF_EV_GF =SUMIFS(GP!O:O, GP!H:H, A2)</li>
+  <li>Q: OFF_EV_GA =SUMIFS(GP!P:P, GP!H:H, A2)</li>
+  </ul>
+
+  <p>We can then use normal arithmetic to calculate EV_GF% and EV_GF%Rel. We can use IFERROR to catch cases where we would otherwise hit an error, and ROUND to round our numbers to two digits after the decimal:
+  <ul><li>EV_GF% =IFERROR(ROUND(EV_GF/(EV_GF+EV_GA), 4)*100, 0)</li>
+  <li>EV_GF%Rel =IFERROR(ROUND((EV_GF/(EV_GF+EV_GA)-(OFF_EV_GF/(OFF_EV_GF+OFF_EV_GA))), 4)*100, 0)</li></ul></p>
+
+  <p>We now have one sheet that contains all the summarized stats for each player who played a game during the season:</p>
+
+  <p><img src="images/google-sheets-totals.png" class = "img-responsive" width = "100%" alt="alt text" title="Hockey player totals in Google Sheets" /></p>
+
+  <p>It’s important to check our numbers, so we can quickly check to make sure total games played equal the 11,702 rows from our <i>GP</i> tab and total goals (EV_G + PP_G + SH_G) equal the 2,150 rows from our <i>Goals</i> tab.</p>
+
+  <p><strong>Summary and Next Steps</strong></p>
+
+  <p>Throughout the above sections, we’ve taken raw data scraped from the Czech U20 league website and summarized it into season totals for each player, all in Google Sheets.</p>
+
+  <p>Some other steps I take with this data before adding it to Pick224 include scraping the biographical data for each player (birthdays, heights, and shot handedness) and joining that with the summarized data. I also pull each player’s most recent jersey number and the teams they played for during the season. You can find my final results on <a href="https://pick224.com/" target="_blank">Pick224</a>.</p>
+
+  <p>As mentioned in the introduction, the first version of the database used for my website was entirely built using the methods above. Once I learned what I wanted to do with my data, I was then able to code these steps using a programming language, allowing me to run the code much more efficiently. If you’re ready to make that jump, I’ll again point you towards <a href="https://meghan.rbind.io/talk/hanic/" target="_blank">Meghan Hall's work</a>.</p>
+
+  <hr />
+  <p><em>If data cleaning isn’t for you and you’d rather jump right into analysis, feel free to download any of the data available on</em> <a href="https://pick224.com/index.html" target="_blank"><em>Pick224</em></a><em>. If you do something cool with the data, please let me know!</em></p>
+      <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+      <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+  </div>
+  </body></html>
