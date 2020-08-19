@@ -63,13 +63,11 @@
 
   <p>Since launching, I’ve written blogs on how to scrape hockey data, whether from <a href="https://pick224.com/blog-posts/2019-10-11-Scraping-junior-hockey-data-from-HTML-pages.html" target="_blank">HTML web pages</a> or sites that use <a href="https://pick224.com/blog-posts/2020-03-04-scraping-canadian-hockey-league-game-data.html" target="_blank">JSON</a>. I’ve since gotten a lot of questions from scouts and others who work in hockey asking about the next steps: cleaning and summarizing data. </p>
 
-  <p>If you have some experience with Excel or Google Sheets, aren’t yet comfortable getting started with a programming language like R or Python for data analysis, but still want to get shit done, this article is for you. Excel and Google Sheets are powerful tools, and it’s okay if you’re not ready to learn a programming language right now. After you get a good understanding of the things you can do with data, you can then venture on and learn R and/or Python if you’d like to do those things more efficiently and effectively.</p>
+  <p>If you have some experience with Excel or Google Sheets and don't want to start learning a programming language like R or Python, but still want to get shit done, this article is for you. Excel and Google Sheets are powerful tools, and it’s okay if you’re not ready to learn a programming language. After you get a good understanding of the things you can do with data, you can then decide if you would like to do those things more efficiently and effectively using R or Python.</p>
 
   <p>In this article, I’ll walk through the whole process of turning raw hockey data into the summarized player totals you see on Pick224, all using Google Sheets. When I first launched Pick224, my database was entirely built using the methods below.</p>
 
   <p>I recommend following along and working through the formulas. <a href="https://pick224.com/blog-posts/2019-10-11-Scraping-junior-hockey-data-from-HTML-pages.html" target="_blank">Here’s a file</a> containing only the raw data that you can make a copy of and follow along with, and <a href="https://pick224.com/blog-posts/2019-10-11-Scraping-junior-hockey-data-from-HTML-pages.html" target="_blank">here’s a copy of a final file</a>, after having worked through everything below.</p>
-
-  <p>If you’re already fully comfortable cleaning and summarizing data using Microsoft Excel, I recommend skipping this article and checking out <a href="https://twitter.com/MeghanMHall" target="_blank">Meghan Hall</a>’s great work on <a href="https://meghan.rbind.io/talk/hanic/" target="_blank">moving beyond Excel for hockey analysis</a> instead.</p>
 
   <p><strong>The Raw Data</strong></p>
 
@@ -363,7 +361,7 @@
 
   <p>Some other steps I take with this data before adding it to Pick224 include scraping the biographical data for each player (birthdays, heights, and shot handedness) and joining that with the summarized data. I also pull each player’s most recent jersey number and the teams they played for during the season. You can find my final results on <a href="https://pick224.com/" target="_blank">Pick224</a>.</p>
 
-  <p>As mentioned in the introduction, the first version of the database used for my website was entirely built using the methods above. Once I learned what I wanted to do with my data, I was then able to code these steps using a programming language, allowing me to run the code much more efficiently. If you’re ready to make that jump, I’ll again point you towards <a href="https://meghan.rbind.io/talk/hanic/" target="_blank">Meghan Hall's work</a>.</p>
+  <p>As mentioned in the introduction, the first version of the database used for my website was entirely built using the methods above. Once I learned what I wanted to do with my data, I was then able to code a lot of these steps using a programming language, allowing me to run the code much more efficiently. If you would like to make that jump, I suggest you check out Meghan Hall's work on <a href="https://meghan.rbind.io/talk/hanic/" target="_blank">"Moving Beyond Excel for Your Hockey Analysis"</a>.</p>
 
   <hr />
   <p><em>If data cleaning isn’t for you and you’d rather jump right into analysis, feel free to download any of the data available on</em> <a href="https://pick224.com/index.html" target="_blank"><em>Pick224</em></a><em>. If you do something cool with the data, please let me know!</em></p>
