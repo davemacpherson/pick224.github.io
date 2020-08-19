@@ -203,7 +203,7 @@
   <br>=IF(O2="", "", IF(E2=1, "P" & REGEXEXTRACT(O2, "[0–9]+") & "X", "M" & REGEXEXTRACT((O2, "[0–9]+") & "X"))</li>
   </ul>
 
-  <p>We can then combine the player IDs using the JOIN function, choosing we’ll choose a pipe as the separator between each player ID:
+  <p>We can then combine the player IDs using the JOIN function, choosing a pipe as the separator between each player ID:
   <ul><li>=JOIN("|", I2:N2)</li></ul></p>
 
   <p>This leaves us with data that looks like the following, which we’ll then join to the goal data:
